@@ -6,5 +6,4 @@
 	echo "Nouvelle version 25/02 11:09...";
 	echo "Encore une modificationle 25/02 11:24...";
 	echo "Modification des images le 25/02 11:45...";
-	grgrtgrgrgr
 ?>
