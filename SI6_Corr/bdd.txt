@@ -1,5 +1,6 @@
 -- -----------------------------
 -- Structure de la table user
+--
 -- -----------------------------
 CREATE TABLE `user` (
   `numero` int(11) NOT NULL AUTO_INCREMENT,
