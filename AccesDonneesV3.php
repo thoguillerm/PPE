@@ -6,8 +6,9 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 2.0 du Vendredi 22 Avril 2016 10:23:00
+ * @version 3.0 du Vendredi 22 Avril 2016 12:23:00
  * 
+ *    + Ajout de l'enregistement des logs de connexion
  */
 
 
@@ -15,11 +16,16 @@
 ///////////// CONFIGURATION DE L'ACCES AUX DONNEES ////////////////////
 
 // nom du moteur d'accès à la base : mysql - mysqli
-$modeacces = "mysqli";
+$modeacces = "mysql";
+
+// affichage des informations de débugage sur :screen - file
+$debug = "ecran";
+
+// sauvegarde des requêtes sql : none - all - 
+$sauvegarde = "none";
 
 // enregistrement des logs de connexion : true false
-$log = "true";
-
+$log = true;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -84,12 +90,12 @@ function connexion($host,$port,$dbname,$user,$password) {
 		$connexion = new mysqli("$host", "$user", "$password", "$dbname", $port);
 		if ($connexion->connect_error) {
 			$chaine = "CNX PB - ".date("j M Y - G:i:s - ").$user." - ". $connexion->connect_error."\r\n";
-			
-				ecritFichier($chaine=="true");
+			if ($log) 
+				ecritFichier($chaine);
 			die('Erreur de connexion (' . $connexion->connect_errno . ') '. $connexion->connect_error);
 		} else {
 			 $chaine = "CNX OK - ".date("j M Y - G:i:s - ").$user."\r\n";
-			
+			 if ($log)
 			 	ecritFichier($chaine);
 		}
 		return $connexion;
@@ -103,6 +109,7 @@ function ecritFichier($uneChaine) {
 		fwrite($handle,$uneChaine);
 	fclose($handle);
 }
+
 
 
 /**

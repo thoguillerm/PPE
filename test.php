@@ -2,14 +2,6 @@
 
 include 'connectAD.php';
 
-
-$sql="select * from user";
-$results = compteSQL($sql);
-
-print_r($results);
-
-/*
-
 $creations ="";
 $insertions="\n\n";
 
@@ -89,5 +81,5 @@ $fichierDump = fopen($dbname.".sql", "w");
 fclose($fichierDump);
 
 
-*/
+
 ?>	
