@@ -6,7 +6,7 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.1 du Jeudi 28 Avril 2016 13:34
+ * @version 3.1.1 du Jeudi 28 Avril 2016 14:44
  *  - 
  * 	- Enregistrement des requetes SQL dans le fichier requetes.sql possible
  *  - Les requetes generant des erreurs sont automatiquement enregistrees
