@@ -21,7 +21,7 @@
 			//local
 			$host = "127.0.0.1";
 			$user = "u487153086_user";
-			$password = "P@ssword";
+			$password = "";
 			$dbname = "u487153086_si6";
 			$port='3306';
 			break;
