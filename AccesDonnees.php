@@ -6,10 +6,11 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.1.1 du Jeudi 28 Avril 2016 14:44
+ * @version 3.1.2 du Jeudi 28 Avril 2016 16:27
  *  - 
  * 	- Enregistrement des requetes SQL dans le fichier requetes.sql possible
  *  - Les requetes generant des erreurs sont automatiquement enregistrees
+ *  - ajout doc utilisation pour la fonction TableSQL
  * 
  */
 
@@ -271,6 +272,18 @@ function compteSQL($sql) {
  *
  *
  * @return un tableau résultat de la requete MySQL.
+ * 
+ * exemple : 	$sql = "select * from user";
+
+				$results = tableSQL($sql);
+
+				foreach ($results as $ligne) {
+					//on extrait chaque valeur de la ligne courante
+					$login = $ligne['login'];
+					$password = $ligne[3];
+	
+					echo $login." ".$password."<br />";
+				}	
  */
 function tableSQL($sql) {
 
