@@ -6,7 +6,10 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 2.0 du Vendredi 22 Avril 2016 10:23:00
+ * @version 3.1 du Jeudi 28 Avril 2016 13:34
+ *  - 
+ * 	- Enregistrement des requetes SQL dans le fichier requetes.sql possible
+ *  - Les requetes generant des erreurs sont automatiquement enregistrees
  * 
  */
 
@@ -15,7 +18,14 @@
 ///////////// CONFIGURATION DE L'ACCES AUX DONNEES ////////////////////
 
 // nom du moteur d'accès à la base : mysql - mysqli
-$modeacces = "mysql";
+$modeacces = "mysqli";
+
+// enregistrement des logs de connexion : true - false
+$logcnx = FALSE;
+
+// enregistrement des requetes SQL : none - all - modif
+$logsql = "none";
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -63,26 +73,69 @@ $mysql_data_type_hash = array(
  */
 function connexion($host,$port,$dbname,$user,$password) {
 	
-	global $modeacces, $connexion;
+	global $modeacces, $logcnx, $connexion;
+	
+
 	
 	if ($modeacces=="mysql") {
-		$link = mysql_connect("$host", "$user", "$password")
-			or die("Erreur de connexion : " . mysql_error());
-		$connexion = mysql_select_db("$dbname")
-			or die("Impossible d'ouvrir la base : ".mysql_error());
+			
+		@$link = mysql_connect("$host:$port", "$user", "$password");
+		
+		if (!$link) {
+			
+			$chaine = "Connexion PB - ".date("j M Y - G:i:s - ").$user." - ". mysql_error()."\r\n";	
+			
+		} else {
+			
+			@$connexion = mysql_select_db("$dbname");
+			if (!$connexion) {
+				$chaine = "Selection base PB - ".date("j M Y - G:i:s - ").$user." - ". mysql_error()."\r\n";	
+			} else {
+				$chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";	
+			}
+			
+		}
+		
+		if ($logcnx)
+			ecritFichierLog($chaine);
+		else
+			echo $chaine."<br />";		
+		
 		return $connexion;
+		
 	}
 
+	
 	if ($modeacces=="mysqli") {
-		$connexion = new mysqli("$host", "$user", "$password", "$dbname", $port);
+		
+		@$connexion = new mysqli("$host", "$user", "$password", "$dbname", $port);
 		if ($connexion->connect_error) {
-			die('Erreur de connexion (' . $connexion->connect_errno . ') '. $connexion->connect_error);
+			
+			$chaine = "Connexion PB - ".date("j M Y - G:i:s - ").$user." - ". $connexion->connect_error."\r\n";
+			$connexion = FALSE;
+			
+		} else {
+			
+			 $chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";
+			 
 		}
+		
+		if ($logcnx)
+			ecritFichierLog($chaine);
+		else
+			echo $chaine."<br />";		
+		
 		return $connexion;
-	}
+	}		
 
 }
 
+
+function ecritFichierLog($uneChaine) {
+	$handle=fopen("log.txt","a");
+		fwrite($handle,$uneChaine);
+	fclose($handle);
+}
 
 
 /**
@@ -122,29 +175,62 @@ function deconnexion() {
  */
 function executeSQL($sql) {
 
-	global $modeacces, $connexion;
+	global $modeacces, $connexion, $logsql;
+	
+	$uneChaine = date("j M Y - G:i:s --> ").$sql."\r\n";
+	
+	if ($logsql=="all") {
+	
+		ecritRequeteSQL($uneChaine);
+	
+	} else {
+	
+		if ($logsql=="modif") {
+	
+			$mot=strtolower(substr($sql,0, 6));
+			if ($mot=="insert" || $mot=="update") {
+				ecritRequeteSQL($uneChaine);
+			}
+	
+		}
+	
+	}
 
 	if ($modeacces=="mysql") {
 		$result = mysql_query($sql)		
-		or die ("Erreur SQL de <b>".$_SERVER["SCRIPT_NAME"]."</b>.<br />
-			 Dans le fichier : ".__FILE__." a la ligne : ".__LINE__."<br />".
-				mysql_error().
-				"<br /><br />
-				<b>REQUETE SQL : </b>$sql<br />");		
-		return $result;
+		or die (afficheErreur($sql, mysql_error()));		
+
 	}
 
 	if ($modeacces=="mysqli") {
 		$result = $connexion->query($sql)		
-		or die ("Erreur SQL de <b>".$_SERVER["SCRIPT_NAME"]."</b>.<br />
-			 Dans le fichier : ".__FILE__." a la ligne : ".__LINE__."<br />".
-				mysqli_error_list($connexion)[0]['error'].      //$mysqli->error_list;
-				"<br /><br />
-				<b>REQUETE SQL : </b>$sql<br />");				
-		return $result;
+		or die (afficheErreur($sql, mysqli_error_list($connexion)[0]['error']));
+				//$mysqli->error_list;							
+
 	}
+	
+	return $result;
 }
 
+function afficheErreur($sql, $erreur) {
+	
+	$uneChaine = "ERREUR SQL : ".date("j M Y - G:i:s.u --> ").$sql." : ($erreur) \r\n";
+	
+	ecritRequeteSQL($uneChaine);
+	
+	return "Erreur SQL de <b>".$_SERVER["SCRIPT_NAME"].
+	       "</b>.<br />Dans le fichier : ".__FILE__.
+	       " a la ligne : ".__LINE__.
+	       "<br />".$erreur.
+			"<br /><br /><b>REQUETE SQL : </b>$sql<br />";
+	
+}
+
+function ecritRequeteSQL($uneChaine) {
+	$handle=fopen("requete.sql","a");
+		fwrite($handle,$uneChaine);
+	fclose($handle);
+}
 
 
 /**
