@@ -6,15 +6,16 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.1.3.2 du Mercredi 4 Mai 2016 15:41
+ * @version 3.1.4 du Mercredi 4 Mai 2016 16:36
  *  - 
- *  - Ajout un deuxieme commentaire
+ *  - Implementation de la fonction versionMYSQL()
  * 
  */
 
 //coucou
 
 //coucou 2 
+
 
 ///////////// CONFIGURATION DE L'ACCES AUX DONNEES ////////////////////
 
@@ -380,6 +381,29 @@ function typechamp($sql, $field_offset) {
 
 	if ($modeacces=="mysqli") {
 		return  $mysql_data_type_hash[$result->fetch_field_direct($field_offset)->type];	
+	}
+
+}
+
+
+/**
+ *
+ *Retourne la version du serveur MySQL
+ *
+ *
+ * @return Retourne une chaîne de caractères représentant la version du serveur MySQL 
+ *         auquel l'extension  est connectée (représenté par le paramètre $connexion). 
+ */
+function versionMYSQL() {
+
+	global $modeacces, $connexion;
+
+	if ($modeacces=="mysql") {
+		return mysql_get_server_info();
+	}
+
+	if ($modeacces=="mysqli") {
+		return   $connexion->server_info;
 	}
 
 }
