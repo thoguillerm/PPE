@@ -6,13 +6,13 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.1.3 du Mercredi Avril 2016 12:58
+ * @version 3.1.3.1 du Mercredi 4 Mai 2016 14:09
  *  - 
- *  - Refactoring de la fonction connexion()
+ *  - Ajout un commentaire
  * 
  */
 
-
+//coucou
 
 ///////////// CONFIGURATION DE L'ACCES AUX DONNEES ////////////////////
 
