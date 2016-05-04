@@ -1,0 +1,45 @@
+/**
+ *  Bibliothèque de fonctions AccesDonnees.php
+ * 
+ *
+ * 
+ * @author Erwan
+ * @copyright Estran
+ * @derniere version :  V3.1.1 
+                     du Jeudi 28 Avril 2016 14:44
+ *   
+ * 	
+ * 
+ */
+ 
+ 
+ V3.1.1 du Jeudi 28 Avril 2016 14:44
+  	+ Enregistrement des requetes SQL dans le fichier requetes.sql possible
+ 	+ Les requetes generant des erreurs sont automatiquement enregistrees
+ 
+ 
+ V3 + Sauvegarde des requetes
+ 
+ 
+ 
+ V2 + Enregistrement des connexions dans un fichier log.txt possible
+ 
+ 
+ 
+ 
+ V1 du Vendredi 20 Avril 2016 17:20
+ 	+ Suppression du parametre '$connexion' dans les toutes les fonctions
+ 
+ 
+ 
+ 
+ V0.9 du Mercredi 20 Avril 2016 17:20
+ 	+ Ajout des fonctions : typechamp($sql, $field_offset)
+ 	                        nombrechamp($sql)
+ 
+ ----------------------------------------------------------------
+ 
+ V0.1 du Mercredi 05 Janvier 2016 17:20 
+ 	+ Ajout des fonctions : -connexion($host,$port,$dbname,$user,$password)
+                             -deconnexion() 
+ 
