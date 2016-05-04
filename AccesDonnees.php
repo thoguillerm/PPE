@@ -6,11 +6,9 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.1.2 du Jeudi 28 Avril 2016 16:27
+ * @version 3.1.3 du Mercredi Avril 2016 12:58
  *  - 
- * 	- Enregistrement des requetes SQL dans le fichier requetes.sql possible
- *  - Les requetes generant des erreurs sont automatiquement enregistrees
- *  - ajout doc utilisation pour la fonction TableSQL
+ *  - Refactoring de la fonction connexion()
  * 
  */
 
@@ -82,27 +80,18 @@ function connexion($host,$port,$dbname,$user,$password) {
 			
 		@$link = mysql_connect("$host:$port", "$user", "$password");
 		
-		if (!$link) {
-			
+		if (!$link) {	
 			$chaine = "Connexion PB - ".date("j M Y - G:i:s - ").$user." - ". mysql_error()."\r\n";	
-			
-		} else {
-			
+			$connexion = FALSE;		
+		} else {			
 			@$connexion = mysql_select_db("$dbname");
 			if (!$connexion) {
 				$chaine = "Selection base PB - ".date("j M Y - G:i:s - ").$user." - ". mysql_error()."\r\n";	
+				$connexion = FALSE;
 			} else {
 				$chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";	
-			}
-			
+			}			
 		}
-		
-		if ($logcnx)
-			ecritFichierLog($chaine);
-		else
-			echo $chaine."<br />";		
-		
-		return $connexion;
 		
 	}
 
@@ -110,33 +99,30 @@ function connexion($host,$port,$dbname,$user,$password) {
 	if ($modeacces=="mysqli") {
 		
 		@$connexion = new mysqli("$host", "$user", "$password", "$dbname", $port);
+		
 		if ($connexion->connect_error) {
-			
 			$chaine = "Connexion PB - ".date("j M Y - G:i:s - ").$user." - ". $connexion->connect_error."\r\n";
-			$connexion = FALSE;
-			
-		} else {
-			
-			 $chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";
-			 
+			$connexion = FALSE;		
+		} else {		
+			 $chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";		 
 		}
 		
-		if ($logcnx)
-			ecritFichierLog($chaine);
-		else
-			echo $chaine."<br />";		
-		
-		return $connexion;
 	}		
 
+	
+	if ($logcnx) {
+		$handle=fopen("log.txt","a");
+			fwrite($handle,$chaine);
+		fclose($handle);	
+	} else {
+		echo $chaine."<br />";
+	}
+	return $connexion;
+	
 }
 
 
-function ecritFichierLog($uneChaine) {
-	$handle=fopen("log.txt","a");
-		fwrite($handle,$uneChaine);
-	fclose($handle);
-}
+
 
 
 /**

@@ -13,9 +13,20 @@
  */
  
  
- V3.1.1 du Jeudi 28 Avril 2016 14:44
+ V3.1.3 du Mercredi Avril 2016 12:58
+	+ Refactoring de la fonction connexion()
+ 
+ 
+ 
+ V3.1.2 du Jeudi 28 Avril 2016 14:44
+  	+ Ajout doc utilisation pour la fonction TableSQL
+ 
+ 	
+ 	
+ V3.1.1 du Jeudi 28 Avril 2016 14:12
   	+ Enregistrement des requetes SQL dans le fichier requetes.sql possible
  	+ Les requetes generant des erreurs sont automatiquement enregistrees
+ 
  
  
  V3 + Sauvegarde des requetes
@@ -37,7 +48,7 @@
  	+ Ajout des fonctions : typechamp($sql, $field_offset)
  	                        nombrechamp($sql)
  
- ----------------------------------------------------------------
+
  
  V0.1 du Mercredi 05 Janvier 2016 17:20 
  	+ Ajout des fonctions : -connexion($host,$port,$dbname,$user,$password)
