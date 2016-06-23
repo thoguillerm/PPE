@@ -5,20 +5,27 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @derniere version :  V3.1.1.2 
- *       du Mercredi 4 Mai 2016 15:41
+ * @derniere version :  V3.1.3.3 
+ *        du Jeudi 23 Juin 2016
  *  
  *   
  * 	
  * 
  */
  
+ V3.1.3.3 du Jeudi 23 Juin 2016
+  + Bug corrigé dans la fonction executeSQL en mode MySQLi (affichage erreur)
+ 
+ 
+ 
  V3.1.3.2 du Mercredi 4 Mai 2016 15:41
- *  - 
- *  - Ajout un deuxieme commentaire
+   + Ajout un deuxieme commentaire
+ 
+ 
  
   V3.1.3.1 du Mercredi 4 Mai  2016 12:58
 	+ Ajout d'un commentaire
+ 
  
  
  V3.1.3 du Mercredi Avril 2016 12:58

@@ -6,9 +6,10 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.1.4 du Mercredi 4 Mai 2016 16:36
- *  - 
- *  - Implementation de la fonction versionMYSQL()
+ * @version 3.1.3.3 Jeudi 23 Juin 2016
+ * 
+ * 
+ *  - Bug corrigé dans la fonction executeSQL en mode MySQLi (affichage erreur)
  * 
  */
 
@@ -193,9 +194,10 @@ function executeSQL($sql) {
 	}
 
 	if ($modeacces=="mysqli") {
-		$result = $connexion->query($sql)		
-		or die (afficheErreur($sql, mysqli_error_list($connexion)[0]['error']));
-				//$mysqli->error_list;							
+		$result = $connexion->query($sql)	
+		//or die (afficheErreur($sql, mysqli_error_list($connexion)[0]['error']));
+		or die (afficheErreur($sql, $connexion->error_list[0]['error']));
+				
 
 	}
 	
