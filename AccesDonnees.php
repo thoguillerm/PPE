@@ -9,7 +9,7 @@
  * @version 4.0 Jeudi 02 Septembre 2016
  *
  * Début implementation PDO
-
+ */
 
 ///////////// CONFIGURATION DE L'ACCES AUX DONNEES ////////////////////
 
