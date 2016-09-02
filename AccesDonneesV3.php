@@ -6,26 +6,29 @@
  * 
  * @author Erwan
  * @copyright Estran
- * @version 3.0 du Vendredi 22 Avril 2016 12:23:00
+ * @version 3.1.3.3 Jeudi 23 Juin 2016
  * 
- *    + Ajout de l'enregistement des logs de connexion
+ * 
+ *  - Bug corrigé dans la fonction executeSQL en mode MySQLi (affichage erreur)
+ * 
  */
 
+//coucou
+
+//coucou 2 
 
 
 ///////////// CONFIGURATION DE L'ACCES AUX DONNEES ////////////////////
 
 // nom du moteur d'accès à la base : mysql - mysqli
-$modeacces = "mysql";
+$modeacces = "mysqli";
 
-// affichage des informations de débugage sur :screen - file
-$debug = "ecran";
+// enregistrement des logs de connexion : true - false
+$logcnx = FALSE;
 
-// sauvegarde des requêtes sql : none - all - 
-$sauvegarde = "none";
+// enregistrement des requetes SQL : none - all - modif
+$logsql = "none";
 
-// enregistrement des logs de connexion : true false
-$log = true;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -73,42 +76,56 @@ $mysql_data_type_hash = array(
  */
 function connexion($host,$port,$dbname,$user,$password) {
 	
-	global $modeacces, $connexion;
+	global $modeacces, $logcnx, $connexion;
+	
+
 	
 	if ($modeacces=="mysql") {
-		$link = mysql_connect("$host", "$user", "$password")
-			or die("Erreur de connexion : " . mysql_error());
-		$connexion = mysql_select_db("$dbname")
-			or die("Impossible d'ouvrir la base : ".mysql_error());
-		
-		$chaine = "CNX OK - ".date("j M Y - G:i:s - ").$user."\r\n";
 			
-		return $connexion;
+		@$link = mysql_connect("$host:$port", "$user", "$password");
+		
+		if (!$link) {	
+			$chaine = "Connexion PB - ".date("j M Y - G:i:s - ").$user." - ". mysql_error()."\r\n";	
+			$connexion = FALSE;		
+		} else {			
+			@$connexion = mysql_select_db("$dbname");
+			if (!$connexion) {
+				$chaine = "Selection base PB - ".date("j M Y - G:i:s - ").$user." - ". mysql_error()."\r\n";	
+				$connexion = FALSE;
+			} else {
+				$chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";	
+			}			
+		}
+		
 	}
 
+	
 	if ($modeacces=="mysqli") {
-		$connexion = new mysqli("$host", "$user", "$password", "$dbname", $port);
+		
+		@$connexion = new mysqli("$host", "$user", "$password", "$dbname", $port);
+		
 		if ($connexion->connect_error) {
-			$chaine = "CNX PB - ".date("j M Y - G:i:s - ").$user." - ". $connexion->connect_error."\r\n";
-			if ($log) 
-				ecritFichier($chaine);
-			die('Erreur de connexion (' . $connexion->connect_errno . ') '. $connexion->connect_error);
-		} else {
-			 $chaine = "CNX OK - ".date("j M Y - G:i:s - ").$user."\r\n";
-			 if ($log)
-			 	ecritFichier($chaine);
+			$chaine = "Connexion PB - ".date("j M Y - G:i:s - ").$user." - ". $connexion->connect_error."\r\n";
+			$connexion = FALSE;		
+		} else {		
+			 $chaine = "Connexion OK - ".date("j M Y - G:i:s - ").$user."\r\n";		 
 		}
-		return $connexion;
+		
 	}		
 
+	
+	if ($logcnx) {
+		$handle=fopen("log.txt","a");
+			fwrite($handle,$chaine);
+		fclose($handle);	
+	} else {
+		echo $chaine."<br />";
+	}
+	return $connexion;
+	
 }
 
 
-function ecritFichier($uneChaine) {
-	$handle=fopen("log.txt","a");
-		fwrite($handle,$uneChaine);
-	fclose($handle);
-}
 
 
 
@@ -149,29 +166,63 @@ function deconnexion() {
  */
 function executeSQL($sql) {
 
-	global $modeacces, $connexion;
+	global $modeacces, $connexion, $logsql;
+	
+	$uneChaine = date("j M Y - G:i:s --> ").$sql."\r\n";
+	
+	if ($logsql=="all") {
+	
+		ecritRequeteSQL($uneChaine);
+	
+	} else {
+	
+		if ($logsql=="modif") {
+	
+			$mot=strtolower(substr($sql,0, 6));
+			if ($mot=="insert" || $mot=="update") {
+				ecritRequeteSQL($uneChaine);
+			}
+	
+		}
+	
+	}
 
 	if ($modeacces=="mysql") {
 		$result = mysql_query($sql)		
-		or die ("Erreur SQL de <b>".$_SERVER["SCRIPT_NAME"]."</b>.<br />
-			 Dans le fichier : ".__FILE__." a la ligne : ".__LINE__."<br />".
-				mysql_error().
-				"<br /><br />
-				<b>REQUETE SQL : </b>$sql<br />");		
-		return $result;
+		or die (afficheErreur($sql, mysql_error()));		
+
 	}
 
 	if ($modeacces=="mysqli") {
-		$result = $connexion->query($sql)		
-		or die ("Erreur SQL de <b>".$_SERVER["SCRIPT_NAME"]."</b>.<br />
-			 Dans le fichier : ".__FILE__." a la ligne : ".__LINE__."<br />".
-				mysqli_error_list($connexion)[0]['error'].      //$mysqli->error_list;
-				"<br /><br />
-				<b>REQUETE SQL : </b>$sql<br />");				
-		return $result;
+		$result = $connexion->query($sql)	
+		//or die (afficheErreur($sql, mysqli_error_list($connexion)[0]['error']));
+		or die (afficheErreur($sql, $connexion->error_list[0]['error']));
+				
+
 	}
+	
+	return $result;
 }
 
+function afficheErreur($sql, $erreur) {
+	
+	$uneChaine = "ERREUR SQL : ".date("j M Y - G:i:s.u --> ").$sql." : ($erreur) \r\n";
+	
+	ecritRequeteSQL($uneChaine);
+	
+	return "Erreur SQL de <b>".$_SERVER["SCRIPT_NAME"].
+	       "</b>.<br />Dans le fichier : ".__FILE__.
+	       " a la ligne : ".__LINE__.
+	       "<br />".$erreur.
+			"<br /><br /><b>REQUETE SQL : </b>$sql<br />";
+	
+}
+
+function ecritRequeteSQL($uneChaine) {
+	$handle=fopen("requete.sql","a");
+		fwrite($handle,$uneChaine);
+	fclose($handle);
+}
 
 
 /**
@@ -212,6 +263,18 @@ function compteSQL($sql) {
  *
  *
  * @return un tableau résultat de la requete MySQL.
+ * 
+ * exemple : 	$sql = "select * from user";
+
+				$results = tableSQL($sql);
+
+				foreach ($results as $ligne) {
+					//on extrait chaque valeur de la ligne courante
+					$login = $ligne['login'];
+					$password = $ligne[3];
+	
+					echo $login." ".$password."<br />";
+				}	
  */
 function tableSQL($sql) {
 
@@ -320,6 +383,29 @@ function typechamp($sql, $field_offset) {
 
 	if ($modeacces=="mysqli") {
 		return  $mysql_data_type_hash[$result->fetch_field_direct($field_offset)->type];	
+	}
+
+}
+
+
+/**
+ *
+ *Retourne la version du serveur MySQL
+ *
+ *
+ * @return Retourne une chaîne de caractères représentant la version du serveur MySQL 
+ *         auquel l'extension  est connectée (représenté par le paramètre $connexion). 
+ */
+function versionMYSQL() {
+
+	global $modeacces, $connexion;
+
+	if ($modeacces=="mysql") {
+		return mysql_get_server_info();
+	}
+
+	if ($modeacces=="mysqli") {
+		return   $connexion->server_info;
 	}
 
 }
